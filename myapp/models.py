@@ -2,22 +2,22 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, email, password, first_name, last_name):
+    def create_user(self, username, email=None, password=None, first_name=None, last_name=None, **extra_fields):
         if not username:
             raise ValueError('Users must have a username')
 
         user = self.model(
             username=username,
             email=UserManager.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name,
+            first_name=first_name or '',
+            last_name=last_name or '',
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password, first_name, last_name):
+    def create_superuser(self, username, email, password, first_name=None, last_name=None):
         user = self.create_user(
             username,
             email,
@@ -33,8 +33,8 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(max_length=254, unique=True, db_index=True)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
